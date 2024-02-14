@@ -1,0 +1,16 @@
+<div class="card flex justify-content-center" style="margin-top: 0.5rem">
+  <h2>Connexion</h2>
+  <form [formGroup]="connexionForm" (ngSubmit)="onLogin()">
+    <span class="p-float-label margin">
+      <input class="input" pInputText id="emailField" required formControlName="email">
+      <label for="emailField">Email</label>
+    </span>
+    <span class="p-float-label margin">
+      <p-password class="input" name="passwordField" id="passwordField"  [toggleMask]="true" formControlName="password"
+                  [feedback]="false">
+      </p-password>
+      <label for="passwordField">Mot de passe</label>
+    </span>
+    <p-button type="submit">Connexion</p-button>
+  </form>
+</div>
