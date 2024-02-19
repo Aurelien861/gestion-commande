@@ -11,10 +11,11 @@ class PermissionService {
               private auth: AuthService) { }
 
   canActivate(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): boolean {
-    if (this.auth.getToken()) {
+    const activeMember = sessionStorage.getItem('currentMemberType') === 'Actif';
+    if (this.auth.getToken() != null && activeMember) {
       return true;
     } else {
-      this.router.navigateByUrl('');
+      this.router.navigateByUrl('auth/login');
       return false;
     }
   }

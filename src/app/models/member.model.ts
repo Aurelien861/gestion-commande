@@ -7,5 +7,8 @@ export interface Member {
   address?: Address;
   city?: string;
   email?: string;
+  password?: string;
+  groupId?: string;
+  memberType?: string;
   [key: string]: any;
 }

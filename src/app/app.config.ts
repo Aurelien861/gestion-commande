@@ -4,11 +4,14 @@ import { provideRouter } from '@angular/router';
 import { routes } from './app.routes';
 import {BrowserModule, provideClientHydration} from '@angular/platform-browser';
 import {BrowserAnimationsModule} from "@angular/platform-browser/animations";
+import {HttpClientModule} from "@angular/common/http";
+import {DatePipe} from "@angular/common";
 
 export const appConfig: ApplicationConfig = {
   providers: [
     provideRouter(routes),
     provideClientHydration(),
-    importProvidersFrom([BrowserModule, BrowserAnimationsModule])
+    importProvidersFrom([BrowserModule, BrowserAnimationsModule, HttpClientModule]),
+    {provide: DatePipe, useClass: DatePipe}
   ]
 };

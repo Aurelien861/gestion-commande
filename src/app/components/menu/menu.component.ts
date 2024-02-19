@@ -11,12 +11,11 @@ import {PanelMenuModule} from "primeng/panelmenu";
 import { DialogModule } from 'primeng/dialog';
 import { DialogService, DynamicDialogRef } from 'primeng/dynamicdialog';
 import {ConnexionComponent} from "../connexion/connexion.component";
-import {InscriptionComponent} from "../inscription/inscription.component";
+import {InscriptionFormComponent} from "../inscription/inscription-form/inscription-form.component";
 import {AutoFocusModule} from "primeng/autofocus";
 import { Router } from '@angular/router';
 import {MenuButtonComponent} from "./menu-button/menu-button.component";
-import {EditMemberComponent} from "../member/edit-member/edit-member.component";
-import {RemoveMemberComponent} from "../member/remove-member/remove-member.component";
+import {AuthService} from "../../services/auth.service";
 
 @Component({
   selector: 'app-menu',
@@ -33,10 +32,8 @@ import {RemoveMemberComponent} from "../member/remove-member/remove-member.compo
     PanelMenuModule,
     DialogModule,
     AutoFocusModule,
-    InscriptionComponent,
+    InscriptionFormComponent,
     MenuButtonComponent,
-    EditMemberComponent,
-    RemoveMemberComponent,
   ],
   providers: [DialogService],
   templateUrl: './menu.component.html',
@@ -57,21 +54,15 @@ export class MenuComponent implements OnInit {
   @Input() tabSelected!: number;
 
   constructor(private renderer: Renderer2,
-              private dialogService: DialogService,
-              private router: Router) { }
+              private router: Router,
+              private authService: AuthService) { }
 
 
   ngOnInit() {
     this.tabs = [
-      { label: 'Matériel', icon: 'pi pi-fw pi-box', command: () => this.openMaterialList() },
-      { label: 'Membres', icon: 'pi pi-fw pi-user', command: () => this.openMemberList() },
+      { label: 'Commandes', icon: 'pi pi-fw pi-box', command: () => this.openCommandList() },
     ];
-
     this.profileMenuItems = [
-      {
-        label: 'Groupes',
-        command: () => this.groups()
-      },
       {
         label: 'Mon profil',
         command: () => this.myProfile()
@@ -98,37 +89,16 @@ export class MenuComponent implements OnInit {
     this.activeTab = event;
   }
 
-  openConnexionForm() {
-    this.ref = this.dialogService.open(ConnexionComponent, {
-      header: 'Connexion',
-      width: '50vw',
-      height: '75vh',
-      contentStyle: { overflow: 'auto' }
-    });
-  }
-
   disconnect() {
-    console.log("Déconnexion")
+    this.authService.logOut();
+    this.router.navigateByUrl('/auth/login');
   }
 
   myProfile() {
     this.router.navigateByUrl('/profile');
   }
 
-  groups() {
-    this.router.navigateByUrl('/group-list');
-  }
-
-
-  openMemberList() {
-    this.router.navigateByUrl('member-list');
-  }
-
-  openGroupList() {
-    this.router.navigateByUrl('group-list');
-  }
-
-  openMaterialList() {
+  openCommandList() {
     this.router.navigateByUrl('material-list');
   }
 

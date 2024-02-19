@@ -1,0 +1,8 @@
+<div class="card flex justify-content-center" style="margin-top: 2rem; margin-bottom: 3rem">
+  <h2>Inscription</h2>
+  <div style="margin-bottom: 1rem">
+    <p>Déjà un compte? <a href="/auth/login">Connexion</a></p>
+  </div>
+  <app-inscription #inscriptionForm (eventUserCreated)="validMemberInscription($event)"></app-inscription>
+  <p-button (click)="signIn()">S'inscrire</p-button>
+</div>

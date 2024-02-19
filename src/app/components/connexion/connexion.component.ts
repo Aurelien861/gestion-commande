@@ -8,6 +8,7 @@ import {AuthService} from "../../services/auth.service";
 import {Router} from "@angular/router";
 import {InputTextModule} from "primeng/inputtext";
 import {regexValidator} from "../../services/regexValidator.service";
+import {NgIf} from "@angular/common";
 
 @Component({
   selector: 'app-connection',
@@ -19,7 +20,8 @@ import {regexValidator} from "../../services/regexValidator.service";
     ButtonModule,
     TooltipModule,
     InputTextModule,
-    ReactiveFormsModule
+    ReactiveFormsModule,
+    NgIf
   ],
   templateUrl: './connexion.component.html',
   styleUrl: './connexion.component.scss'
@@ -27,9 +29,10 @@ import {regexValidator} from "../../services/regexValidator.service";
 export class ConnexionComponent {
 
   connexionForm = this.fb.group({
-    email: ['aurelien.dufour257@gmail.com', Validators.required, regexValidator(/^[\w-.]+@([\w-]+\.)+[\w-]{2,4}$/)],
-    password: ['mdp', Validators.required]
+    email: ['valentin.morin@lyreco.com', Validators.required, regexValidator(/^[\w-.]+@([\w-]+\.)+[\w-]{2,4}$/)],
+    password: ['tropBi1CeCoursDeBDS!', Validators.required]
   });
+  connexionFailed = false;
 
   constructor(private auth: AuthService,
               private router: Router,
@@ -38,8 +41,18 @@ export class ConnexionComponent {
 
   onLogin() {
     if(this.connexionForm && this.connexionForm.valid) {
-      this.auth.login();
-      this.router.navigateByUrl('material-list');
+      const emailValue = this.connexionForm.get('email')?.value;
+      const passwordValue = this.connexionForm.get('password')?.value;
+      if(emailValue && passwordValue) {
+        this.auth.login(emailValue, passwordValue).then(response => {
+          if(response) {
+            this.connexionFailed = false;
+            this.router.navigateByUrl('material-list');
+          } else {
+            this.connexionFailed = true;
+          }
+        });
+      }
     }
   }
 

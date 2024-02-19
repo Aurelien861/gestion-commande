@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import {Component, OnInit} from '@angular/core';
 import {ButtonModule} from "primeng/button";
 import {Router} from "@angular/router";
 
@@ -11,13 +11,19 @@ import {Router} from "@angular/router";
   templateUrl: './menu-button.component.html',
   styleUrl: './menu-button.component.scss'
 })
-export class MenuButtonComponent {
+export class MenuButtonComponent implements OnInit{
+
+  buttonLabel! : string;
 
   constructor(private router: Router) {
   }
 
+  ngOnInit(): void {
+    this.buttonLabel = 'Gestion commandes'
+  }
+
   goToMenu() {
-    this.router.navigateByUrl('');
+    this.router.navigateByUrl('material-list');
   }
 
 }

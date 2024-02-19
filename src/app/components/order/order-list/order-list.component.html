@@ -1,0 +1,176 @@
+<app-menu [tabSelected]="0"></app-menu>
+<div class="card">
+  <p-toast></p-toast>
+  <p-table
+    #dt
+    [value]="orders"
+    [rowHover]="false"
+    [rows]="10"
+    [columns]="columns"
+    [showCurrentPageReport]="true"
+    [rowsPerPageOptions]="[10, 25, 50]"
+    [globalFilterFields]="['dateBegin', 'dateEnd', 'model', 'products', 'sellerName']"
+    [loading]="loading"
+    [paginator]="true"
+    currentPageReportTemplate="Produits {first} à {last} sur {totalRecords}"
+    [filterDelay]="0"
+    [scrollable]="true"
+    scrollHeight="62vh"
+  >
+
+    <ng-template pTemplate="caption">
+      <div class="flex" style="align-items: center">
+        <span style="margin-left: 1rem;">
+            <button (click)="resetOrders()"
+                    [ngStyle]="{ 'cursor':  'pointer',
+                    'background': 'none', 'border': 'none', 'vertical-align': 'middle' }">
+              <span class="pi pi-undo" style="font-size: 1.5rem" ></span>
+            </button>
+        </span>
+        <span class="p-input-icon-left ml-auto">
+          <i class="pi pi-search"></i>
+          <input
+            class="p-inputtext p-component p-element"
+            type="text"
+            (input)="dt.filterGlobal($any($event.target).value, 'contains')"
+            placeholder="Recherche par mot clé"
+          />
+          <span style="margin-left: 3rem">
+            <p-button icon="pi pi-plus" (click)="openAddDialog()" ></p-button>
+          </span>
+        </span>
+      </div>
+    </ng-template>
+
+    <ng-template pTemplate="header">
+      <tr>
+        <th *ngFor="let col of columns" [pSortableColumn]="col.pSortableColumn" pFrozenColumn [frozen]="col.frozen">
+          <div class="flex justify-content-between align-items-center">
+            {{col.header}}
+            <p-sortIcon *ngIf="col.header != ''" [field]="col.pSortableColumn"></p-sortIcon>
+          </div>
+        </th>
+      </tr>
+      <tr>
+        <th pFrozenColumn style="min-width:15rem">
+          <p-columnFilter type="text" field="beginDate" (input)="onFilter($event, 'beginDate')"
+                          (keyup.enter)="loadOrders()"
+          ></p-columnFilter>
+          <p-columnFilter type="text" field="endDate" (input)="onFilter($event, 'endDate')"
+                          (keyup.enter)="loadOrders()"
+          ></p-columnFilter>
+        </th>
+        <th></th>
+        <th style="min-width:15rem">
+          <p-columnFilter type="text" field="clientName" (input)="onFilter($event, 'clientName')"
+                          (keyup.enter)="loadOrders()"
+          ></p-columnFilter>
+        </th>
+        <th style="min-width:15rem">
+          <p-columnFilter type="text" field="materialIds" (input)="onFilter($event, 'materialIds')"
+                          (keyup.enter)="loadOrders()"
+          ></p-columnFilter>
+        </th>
+        <th></th>
+        <th></th>
+        <th style="min-width:15rem">
+          <p-columnFilter type="text" field="sellerName" (input)="onFilter($event, 'sellerName')"
+                          (keyup.enter)="loadOrders()"
+          ></p-columnFilter>
+        </th>
+        <th></th>
+    </ng-template>
+
+    <ng-template pTemplate="body" let-order>
+      <tr class="p-selectable-row" [pSelectableRow]="order">
+        <td pFrozenColumn>
+          <span class="p-column-title">Date</span>
+          {{ order.date }}
+        </td>
+        <td>
+          <span class="p-column-title">Numéro client</span>
+          {{ order.clientId }}
+        </td>
+        <td >
+          <span class="p-column-title">Client</span>
+          {{ order.clientName }}
+        </td>
+        <td>
+          <span class="p-column-title">Produits commandés</span>
+          <span *ngFor="let materialId of order.materialIds">{{ materialId }} </span>
+        </td>
+        <td >
+          <span class="p-column-title">Prix</span>
+          {{ order.totalPrice }} €
+        </td>
+        <td>
+          <span class="p-column-title">Numéro vendeur</span>
+          {{ order.sellerId }}
+        </td>
+        <td>
+          <span class="p-column-title">Vendeur</span>
+          {{ order.sellerName }}
+        </td>
+        <td>
+          <div class="button-container">
+            <p-button pRipple icon="pi pi-pencil" class="p-button-rounded p-button-success mr-2" [rounded]="true"
+                      (click)="openEditionDialog(order)"></p-button>
+            <p-button  icon="pi pi-trash" class="p-button-rounded p-button-warning mr-2" [rounded]="true"
+                       (click)="openDeletionDialog(order)"></p-button>
+          </div>
+        </td>
+      </tr>
+    </ng-template>
+
+    <ng-template pTemplate="emptymessage">
+      <tr>
+        <td colspan="8">Aucune commande trouvée</td>
+      </tr>
+    </ng-template>
+  </p-table>
+</div>
+
+<p-dialog header="Header" [(visible)]="isAddDialogOpen" [modal]="true" [style]="{ width: '50rem' }"
+          [breakpoints]="{ '1199px': '75vw', '575px': '90vw' }" [draggable]="false">
+  <ng-template pTemplate="header">
+    <h3>Ajout de commande</h3>
+  </ng-template>
+  <div class="center-content">
+    <app-add-command> </app-add-command>
+  </div>
+  <ng-template pTemplate="footer">
+    <p-button icon="pi pi-times" (click)="closeAddDialog()" label="Annuler" pAutoFocus [autofocus]="true"></p-button>
+    <p-button icon="pi pi-user-plus" (click)="submitCreationForm()" label="Enregistrer" pAutoFocus type="submit"></p-button>
+  </ng-template>
+</p-dialog>
+
+<p-dialog header="Header" [(visible)]="isEditionDialogOpen" [modal]="true" [style]="{ width: '50rem' }"
+          [breakpoints]="{ '1199px': '75vw', '575px': '90vw' }" [draggable]="false">
+  <ng-template pTemplate="header">
+    <h3>Modification</h3>
+  </ng-template>
+  <div class="center-content">
+    <app-edit-order [order]="selectedOrder"></app-edit-order>
+  </div>
+  <ng-template pTemplate="footer">
+    <p-button icon="pi pi-times" (click)="closeEditionDialog()" label="Annuler" pAutoFocus [autofocus]="true"></p-button>
+    <p-button icon="pi pi-pencil" label="Modifier" pAutoFocus type="submit"
+              [disabled]="true"></p-button>
+  </ng-template>
+</p-dialog>
+
+<p-dialog header="Header" [(visible)]="isDeletionDialogOpen" [modal]="true" [style]="{ width: '50rem' }"
+          [breakpoints]="{ '1199px': '75vw', '575px': '90vw' }" [draggable]="false">
+  <ng-template pTemplate="header">
+    <h3>Suppression</h3>
+  </ng-template>
+  <div class="center-content">
+    <app-remove-order [order]="selectedOrder"></app-remove-order>
+  </div>
+  <ng-template pTemplate="footer">
+    <p-button icon="pi pi-times" (click)="closeDeletionDialog()" label="Annuler" pAutoFocus [autofocus]="true"></p-button>
+    <p-button icon="pi pi-trash" label="Supprimer" pAutoFocus type="submit"
+              [disabled]="true"></p-button>
+  </ng-template>
+</p-dialog>
+
